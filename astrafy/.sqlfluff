@@ -1,0 +1,14 @@
+[sqlfluff]
+# Canvia el dialect per la teva base de dades (ex: snowflake, bigquery, postgres)
+dialect = bigquery
+templater = dbt
+encoding = utf-8
+
+[sqlfluff:templater:dbt]
+# SQLFluff necessita compilar el projecte dbt, així que indica on té els profiles
+profiles_dir = /Users/canela
+profile = astrafy
+
+[sqlfluff:rules]
+# Pots personalitzar regles aquí, per exemple la longitud màxima de línia
+max_line_length = 120

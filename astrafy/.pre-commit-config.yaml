@@ -1,0 +1,8 @@
+repos:
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 4.1.0
+    hooks:
+      - id: sqlfluff-lint
+        additional_dependencies: ['sqlfluff-templater-dbt==4.1.0', 'dbt-core==1.10.23', 'dbt-bigquery==1.10.2']
+      - id: sqlfluff-fix
+        additional_dependencies: ['sqlfluff-templater-dbt==4.1.0', 'dbt-core==1.10.23', 'dbt-bigquery==1.10.2']
