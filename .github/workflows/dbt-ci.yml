@@ -27,6 +27,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Load project variables
+        run: cat vars/project.env >> "$GITHUB_ENV"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -46,14 +49,10 @@ jobs:
         env:
           DBT_PROFILES_DIR: ${{ github.workspace }}/astrafy
           DBT_KEYFILE: ${{ runner.temp }}/dbt/service-account.json
-          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
         run: dbt deps
 
       - name: Parse project
         env:
           DBT_PROFILES_DIR: ${{ github.workspace }}/astrafy
           DBT_KEYFILE: ${{ runner.temp }}/dbt/service-account.json
-          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
         run: dbt parse
