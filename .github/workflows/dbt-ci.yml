@@ -1,0 +1,60 @@
+name: dbt CI
+
+on:
+  pull_request:
+    paths:
+      - "astrafy/**"
+      - ".github/workflows/dbt-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "astrafy/**"
+      - ".github/workflows/dbt-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate dbt project
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: astrafy
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dbt and DuckDB adapter
+        run: pip install "dbt-duckdb==1.9.*"
+
+      - name: Create CI profile
+        run: |
+          mkdir -p "$RUNNER_TEMP/dbt"
+          cat > "$RUNNER_TEMP/dbt/profiles.yml" <<'EOF'
+          astrafy:
+            target: ci
+            outputs:
+              ci:
+                type: duckdb
+                path: ':memory:'
+                threads: 1
+          EOF
+
+      - name: Install dbt packages
+        env:
+          DBT_PROFILES_DIR: ${{ runner.temp }}/dbt
+        run: dbt deps
+
+      - name: Parse project
+        env:
+          DBT_PROFILES_DIR: ${{ runner.temp }}/dbt
+        run: dbt parse
