@@ -35,30 +35,16 @@ jobs:
       - name: Install dbt and BigQuery adapter
         run: pip install "dbt-bigquery==1.9.*"
 
-      - name: Create BigQuery credentials and CI profile
+      - name: Create BigQuery credentials
         env:
           GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
         run: |
           mkdir -p "$RUNNER_TEMP/dbt"
           printf '%s' "$GCP_SERVICE_ACCOUNT_KEY" > "$RUNNER_TEMP/dbt/service-account.json"
-          cat > "$RUNNER_TEMP/dbt/profiles.yml" <<'EOF'
-          astrafy:
-            target: ci
-            outputs:
-              ci:
-                type: bigquery
-                method: service-account
-                project: "{{ env_var('GCP_PROJECT_ID') }}"
-                dataset: "{{ env_var('DBT_BIGQUERY_DATASET') }}"
-                keyfile: "{{ env_var('DBT_KEYFILE') }}"
-                threads: 1
-          EOF
 
       - name: Install dbt packages
         env:
-          DBT_PROFILES_DIR: ${{ runner.temp }}/dbt
+          DBT_PROFILES_DIR: ${{ github.workspace }}/astrafy
           DBT_KEYFILE: ${{ runner.temp }}/dbt/service-account.json
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
@@ -66,7 +52,7 @@ jobs:
 
       - name: Parse project
         env:
-          DBT_PROFILES_DIR: ${{ runner.temp }}/dbt
+          DBT_PROFILES_DIR: ${{ github.workspace }}/astrafy
           DBT_KEYFILE: ${{ runner.temp }}/dbt/service-account.json
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
