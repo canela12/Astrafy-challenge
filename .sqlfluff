@@ -4,6 +4,7 @@ templater = dbt
 encoding = utf-8
 
 [sqlfluff:templater:dbt]
+project_dir = astrafy
 profiles_dir = /Users/canela
 profile = astrafy
 

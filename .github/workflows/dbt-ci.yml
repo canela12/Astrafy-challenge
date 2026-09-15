@@ -1,0 +1,58 @@
+name: dbt CI
+
+on:
+  pull_request:
+    paths:
+      - "astrafy/**"
+      - ".github/workflows/dbt-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "astrafy/**"
+      - ".github/workflows/dbt-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate dbt project
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: astrafy
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Load project variables
+        run: cat vars/project.env >> "$GITHUB_ENV"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt and BigQuery adapter
+        run: pip install "dbt-bigquery==1.9.*"
+
+      - name: Create BigQuery credentials
+        env:
+          GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/dbt"
+          printf '%s' "$GCP_SERVICE_ACCOUNT_KEY" > "$RUNNER_TEMP/dbt/service-account.json"
+
+      - name: Install dbt packages
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/astrafy
+          DBT_KEYFILE: ${{ runner.temp }}/dbt/service-account.json
+        run: dbt deps
+
+      - name: Parse project
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/astrafy
+          DBT_KEYFILE: ${{ runner.temp }}/dbt/service-account.json
+        run: dbt parse

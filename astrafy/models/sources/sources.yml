@@ -1,0 +1,45 @@
+version: 2
+
+sources:
+  - name: google_sheets
+    database: "{{ target.database }}"
+    dataset: "EXT"
+    tables:
+      - name: orders_recrutement
+        identifier: orders_recrutement_external
+        external:
+          location: https://docs.google.com/spreadsheets/d/1ABJgyGWlGOOXQaSpLWPrudYY2TTaHhQrFPLvo9s7CvY
+          options:
+            format: GOOGLE_SHEETS
+            sheet_range: Sheet1!A:D
+            skip_leading_rows: 1
+        columns:
+          - name: date_date
+            data_type: DATE
+          - name: customers_id
+            data_type: NUMERIC
+          - name: orders_id
+            data_type: NUMERIC
+          - name: net_sales
+            data_type: FLOAT64
+      - name: sales_recrutement
+        identifier: sales_recrutement_external
+        external:
+          location: https://docs.google.com/spreadsheets/d/1mWYpt6ipv3n1hbqERwHooYPUUPDrDxNI_Z9KmRoDqLg
+          options:
+            format: GOOGLE_SHEETS
+            sheet_range: sales!A:F
+            skip_leading_rows: 1
+        columns:
+          - name: date_date
+            data_type: DATE
+          - name: customer_id
+            data_type: NUMERIC
+          - name: order_id
+            data_type: NUMERIC
+          - name: products_id
+            data_type: NUMERIC
+          - name: net_sales
+            data_type: FLOAT64
+          - name: qty
+            data_type: NUMERIC
