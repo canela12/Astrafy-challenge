@@ -8,4 +8,8 @@ astrafy:
       dataset: "{{ env_var('DBT_BIGQUERY_DATASET') }}"
       location: "{{ env_var('DBT_BIGQUERY_LOCATION', 'US') }}"
       keyfile: "{{ env_var('DBT_KEYFILE') }}"
+      scopes:
+        - https://www.googleapis.com/auth/bigquery
+        - https://www.googleapis.com/auth/cloud-platform
+        - https://www.googleapis.com/auth/drive.readonly
       threads: 1

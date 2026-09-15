@@ -5,4 +5,7 @@ packages:
   - name: elementary
     package: elementary-data/elementary
     version: 0.25.1
-sha1_hash: 22985280af6fc8173270e32657c8c58564d9c0e8
+  - name: dbt_external_tables
+    package: dbt-labs/dbt_external_tables
+    version: 0.11.1
+sha1_hash: d79280f273d6a6dfa15c409a722e5e4ce645c33a

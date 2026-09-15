@@ -1,4 +1,0 @@
-dbt_packages/
-target/
-logs/
-macros/elementary_materialization.sql

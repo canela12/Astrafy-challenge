@@ -1,0 +1,4 @@
+astrafy/dbt_packages/
+astrafy/target/
+astrafy/logs/
+astrafy/macros/elementary_materialization.sql
