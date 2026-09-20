@@ -38,7 +38,7 @@ dim_orders as (
 select
     order_date,
     customer_id,
-    order_id,
+    orders.order_id,
     net_sales,
     coalesce(order_segmentation, "N/A") as order_segmentation
 from orders
