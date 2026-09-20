@@ -38,7 +38,7 @@ order_qty as (
 select
     order_date,
     customer_id,
-    order_id,
+    orders.order_id,
     net_sales,
     coalesce(qty_product, 0) as qty_product
 from orders
