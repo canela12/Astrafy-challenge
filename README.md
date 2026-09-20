@@ -4,7 +4,7 @@ This repository contains the dbt / BigQuery transformations and the Looker
 semantic layer for the take-home challenge.
 
 - [dbt project](astrafy/): source declarations, staging and order marts.
-- [Looker setup, architecture and validation]: https://github.com/canela12/astrafy_looker
+- [Looker setup, architecture and validation](https://github.com/canela12/astrafy_looker)
 
 ## Modeling Desicions Justifications
 
