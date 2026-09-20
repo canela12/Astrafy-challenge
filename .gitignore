@@ -6,3 +6,5 @@ logs/
 .venv/
 dbt_internal_packages/
 .user.yml
+/output/
+.DS_Store
