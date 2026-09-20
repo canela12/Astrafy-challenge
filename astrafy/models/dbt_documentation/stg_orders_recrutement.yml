@@ -1,0 +1,31 @@
+version: 2
+models:
+- name: stg_orders_recrutement
+  description: Order headers from the orders_recrutement external source, with one row per order. Source
+    column names are standardised without filtering dates or changing values.
+  columns:
+  - name: order_id
+    description: Globally unique order identifier, renamed from source orders_id. Joins order headers
+      to sales lines and downstream order models.
+    data_tests:
+    - not_null
+    - unique
+    data_type: NUMERIC
+  - name: customer_id
+    description: Identifier of the customer who placed the order, renamed from source customers_id. A
+      customer can place multiple orders.
+    data_tests:
+    - not_null
+    data_type: NUMERIC
+  - name: order_date
+    description: Calendar date on which the order was placed, renamed from source date_date. Contains
+      no time of day and is the partition column of this staging table.
+    data_tests:
+    - not_null
+    data_type: DATE
+  - name: net_sales
+    description: Net sales amount for the entire order, copied from the source. Currency and tax treatment
+      are not specified; this is an order-level amount, not a product-line amount.
+    data_tests:
+    - not_null
+    data_type: FLOAT64

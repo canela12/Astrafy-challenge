@@ -1,0 +1,45 @@
+version: 2
+models:
+- name: fac_orders
+  description: 'One row per order, combining order-header attributes with summed product quantities. Covers
+    the beginning of the calendar year before start_date through end_date, inclusive: 2025 and 2026 with
+    the default variables. Orders without matching sales lines are retained.'
+  data_tests:
+  - within_order_period:
+      include_previous_year: true
+  columns:
+  - name: order_id
+    description: Unique order identifier from stg_orders_recrutement. Used to join the sum of quantities
+      from stg_sales_recrutement.
+    data_tests:
+    - not_null
+    - unique
+    - dbt_utils.at_least_one
+    - relationships:
+        to: ref('stg_orders_recrutement')
+        field: order_id
+    data_type: NUMERIC
+  - name: customer_id
+    description: Identifier of the customer who placed the order, preserved from the order header.
+    data_tests:
+    - not_null
+    data_type: NUMERIC
+  - name: order_date
+    description: Calendar date of the order, preserved from the order header and restricted to the configured
+      historical and reporting period.
+    data_tests:
+    - not_null
+    data_type: DATE
+  - name: net_sales
+    description: Net sales amount from the order header. Preserved once per order and not recomputed from
+      product-line sales. Currency and tax treatment are unspecified.
+    data_tests:
+    - not_null
+    data_type: FLOAT64
+  - name: qty_product
+    description: Sum of sales-line qty for the order within the configured date range. Counts product
+      units, not distinct product IDs. Set to zero when no sales lines match or the aggregated quantity
+      is null; missing source quantities are separately rejected by staging tests.
+    data_tests:
+    - not_null
+    data_type: NUMERIC

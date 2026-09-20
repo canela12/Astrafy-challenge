@@ -1,0 +1,51 @@
+version: 2
+models:
+- name: stg_sales_recrutement
+  description: Product sales lines from the sales_recrutement external source, with one row per order
+    and product. Source column names are standardised without filtering dates or aggregating quantities.
+  data_tests:
+  - dbt_utils.unique_combination_of_columns:
+      combination_of_columns:
+      - order_id
+      - product_id
+  columns:
+  - name: order_id
+    description: Identifier of the order containing the product line. References stg_orders_recrutement.order_id
+      and forms the sales-line key together with product_id.
+    data_tests:
+    - not_null
+    - relationships:
+        to: ref('stg_orders_recrutement')
+        field: order_id
+    data_type: NUMERIC
+  - name: product_id
+    description: Identifier of the product sold, renamed from source products_id. Unique within an order,
+      not across the whole table.
+    data_tests:
+    - not_null
+    data_type: NUMERIC
+  - name: customer_id
+    description: Identifier of the customer on the sales line. Must match the customer recorded in the
+      corresponding order header.
+    data_tests:
+    - not_null
+    data_type: NUMERIC
+  - name: order_date
+    description: Calendar date of the sale, renamed from source date_date. Must match the corresponding
+      order header and is the partition column of this staging table.
+    data_tests:
+    - not_null
+    data_type: DATE
+  - name: net_sales
+    description: Net sales amount for this product line. Currency and tax treatment are unspecified. This
+      amount is not used to replace the order-header net_sales in the current facts.
+    data_tests:
+    - not_null
+    data_type: FLOAT64
+  - name: qty
+    description: Number of product units on the sales line. Summed by order to calculate qty_product;
+      does not represent a count of distinct products. The source does not specify a policy for returns
+      or negative quantities.
+    data_tests:
+    - not_null
+    data_type: NUMERIC
