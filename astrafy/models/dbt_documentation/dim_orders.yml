@@ -1,0 +1,39 @@
+version: 2
+models:
+- name: dim_orders
+  description: One row per order from the start of the calendar year containing start_date through end_date,
+    inclusive. Classifies each order using the customer's orders in the preceding 365 days, excluding
+    all orders on the current order day. Loads the previous calendar year as history. With the default
+    variables, the output covers 2026.
+  data_tests:
+  - within_order_period
+  columns:
+  - name: order_id
+    description: Unique identifier of the classified order, sourced from stg_orders_recrutement.order_id.
+      The segment belongs to this order, not permanently to the customer.
+    data_tests:
+    - not_null
+    - unique
+    - dbt_utils.at_least_one
+    - relationships:
+        to: ref('stg_orders_recrutement')
+        field: order_id
+    data_type: NUMERIC
+  - name: order_date
+    description: Date of the classified order. Defines the reference day for the rolling history window
+      and is retained for joins and reporting-period filters.
+    data_tests:
+    - not_null
+    data_type: DATE
+  - name: order_segmentation
+    description: 'Customer status at the time of the order: New for zero prior orders, Returning for one
+      to three, and VIP for at least four. Counts orders from day -365 through day -1, so same-day orders
+      receive the same segment. The SQL fallback N/A is rejected by the accepted-values test.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        values:
+        - New
+        - Returning
+        - VIP
+    data_type: STRING

@@ -20,10 +20,16 @@ sources:
             data_type: NUMERIC
           - name: orders_id
             data_type: NUMERIC
+            data_tests:
+              - not_null
+              - unique
           - name: net_sales
             data_type: FLOAT64
       - name: sales_recrutement
         identifier: sales_recrutement_external
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              combination_of_columns: [order_id, products_id]
         external:
           location: https://docs.google.com/spreadsheets/d/1mWYpt6ipv3n1hbqERwHooYPUUPDrDxNI_Z9KmRoDqLg
           options:
@@ -37,8 +43,12 @@ sources:
             data_type: NUMERIC
           - name: order_id
             data_type: NUMERIC
+            data_tests:
+              - not_null
           - name: products_id
             data_type: NUMERIC
+            data_tests:
+              - not_null
           - name: net_sales
             data_type: FLOAT64
           - name: qty

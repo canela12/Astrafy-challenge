@@ -1,0 +1,53 @@
+version: 2
+models:
+- name: fac_orders_segment
+  description: 'One row per order from the start of the calendar year containing start_date through end_date,
+    inclusive: 2026 with the default variables. Enriches order-header attributes with the order-time segment
+    from dim_orders, joined on order_id.'
+  data_tests:
+  - within_order_period
+  columns:
+  - name: order_id
+    description: Unique order identifier from stg_orders_recrutement. References the same order in dim_orders
+      and fac_orders.
+    data_tests:
+    - not_null
+    - unique
+    - dbt_utils.at_least_one
+    - relationships:
+        to: ref('fac_orders')
+        field: order_id
+    - relationships:
+        to: ref('dim_orders')
+        field: order_id
+    data_type: NUMERIC
+  - name: customer_id
+    description: Identifier of the customer who placed the order, preserved from the order header. A customer
+      may appear under different segments across different orders.
+    data_tests:
+    - not_null
+    data_type: NUMERIC
+  - name: order_date
+    description: Calendar date of the order, restricted to the reporting period. Prior-year orders support
+      segmentation upstream but are not included in this fact.
+    data_tests:
+    - not_null
+    data_type: DATE
+  - name: net_sales
+    description: Net sales amount for the order, preserved from stg_orders_recrutement without aggregation
+      or multiplication. Currency and tax treatment are unspecified.
+    data_tests:
+    - not_null
+    data_type: FLOAT64
+  - name: order_segmentation
+    description: 'Order-time segment joined from dim_orders: New, Returning or VIP, based on previous
+      orders in the 365-day window excluding the order day. A missing segment is replaced by N/A in SQL;
+      the accepted-values test treats that fallback as a data-quality failure.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        values:
+        - New
+        - Returning
+        - VIP
+    data_type: STRING

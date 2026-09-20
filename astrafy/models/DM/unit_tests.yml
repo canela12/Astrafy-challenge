@@ -1,0 +1,59 @@
+version: 2
+
+unit_tests:
+  - name: dim_orders_segment_thresholds
+    description: "A customer's first through fifth orders move from New to Returning to VIP."
+    model: dim_orders
+    overrides:
+      vars:
+        start_date: '2026-01-01'
+        end_date: '2026-12-31'
+    given:
+      - input: ref('stg_orders_recrutement')
+        rows:
+          - {order_id: 1, customer_id: 10, order_date: '2026-01-01'}
+          - {order_id: 2, customer_id: 10, order_date: '2026-01-02'}
+          - {order_id: 3, customer_id: 10, order_date: '2026-01-03'}
+          - {order_id: 4, customer_id: 10, order_date: '2026-01-04'}
+          - {order_id: 5, customer_id: 10, order_date: '2026-01-05'}
+          - {order_id: 6, customer_id: 20, order_date: '2026-01-05'}
+    expect:
+      rows:
+        - {order_id: 1, order_date: '2026-01-01', order_segmentation: 'New'}
+        - {order_id: 2, order_date: '2026-01-02', order_segmentation: 'Returning'}
+        - {order_id: 3, order_date: '2026-01-03', order_segmentation: 'Returning'}
+        - {order_id: 4, order_date: '2026-01-04', order_segmentation: 'Returning'}
+        - {order_id: 5, order_date: '2026-01-05', order_segmentation: 'VIP'}
+        - {order_id: 6, order_date: '2026-01-05', order_segmentation: 'New'}
+
+  - name: dim_orders_history_and_date_boundaries
+    description: "History includes day -365, excludes -366 and same-day orders, and output respects both period boundaries."
+    model: dim_orders
+    overrides:
+      vars:
+        start_date: '2026-01-01'
+        end_date: '2026-12-31'
+    given:
+      - input: ref('stg_orders_recrutement')
+        rows:
+          # Exactly 365 days before 2026-01-01: included.
+          - {order_id: 1, customer_id: 10, order_date: '2025-01-01'}
+          - {order_id: 2, customer_id: 10, order_date: '2026-01-01'}
+          # 366 days before 2026-01-02: excluded, even though loaded as history.
+          - {order_id: 3, customer_id: 20, order_date: '2025-01-01'}
+          - {order_id: 4, customer_id: 20, order_date: '2026-01-02'}
+          # Same-day orders do not count each other; both count the following day.
+          - {order_id: 5, customer_id: 30, order_date: '2026-06-01'}
+          - {order_id: 6, customer_id: 30, order_date: '2026-06-01'}
+          - {order_id: 7, customer_id: 30, order_date: '2026-06-02'}
+          # Upper bound is inclusive; the next year is excluded.
+          - {order_id: 8, customer_id: 40, order_date: '2026-12-31'}
+          - {order_id: 9, customer_id: 40, order_date: '2027-01-01'}
+    expect:
+      rows:
+        - {order_id: 2, order_date: '2026-01-01', order_segmentation: 'Returning'}
+        - {order_id: 4, order_date: '2026-01-02', order_segmentation: 'New'}
+        - {order_id: 5, order_date: '2026-06-01', order_segmentation: 'New'}
+        - {order_id: 6, order_date: '2026-06-01', order_segmentation: 'New'}
+        - {order_id: 7, order_date: '2026-06-02', order_segmentation: 'Returning'}
+        - {order_id: 8, order_date: '2026-12-31', order_segmentation: 'New'}
