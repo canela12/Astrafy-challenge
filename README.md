@@ -9,7 +9,7 @@ semantic layer for the take-home challenge.
 ## Modeling Desicions Justifications
 
 I have uploaded the exports to google drive and leveaged the dbt-labs/dbt_external_tables allowing to schedule the data ingestion process from this source of data. I created the source file where the external files are targetted and added uniquness tests along with nullity checks. The external tables are called 
-from the staging models and materializated for imporoving the performance. The tables are partitioned by date and clusterd with the respective fields. Ideally I would have liked to apply 
+from the staging models and materializated for improving the performance. The tables are partitioned by date and clusterd with the respective fields. Ideally I would have liked to apply 
 the insert_overwrite incremental strategy for the models but since I am using the BigQuery's free tier I do not have access to DML statements. The other models contain date variables to be triggered either manually or from the orchestrator. If the incremental strategy was available I would have created the incremental condition in order to update the table daily or when a backfill was needed. 
 
 Regarding the modeling desing I decided to create two facts and one dimension. Fac_orders agregates at order level the qty from stg_sales_recrutement and combines this calculation with 
@@ -26,7 +26,7 @@ Finally I attach the segment field to the 2026 stg_orders_recrutement data gener
 
 For all the models I added a .yml document to describe the fields in BigQuery. There are unit tests dim_orders model as it contains the most delicate logic. Also created a test folder where extra tests for the models are added to ensure the correct model behaviour. I installed elementary wich is a tool performing statistical tests but I needed to disable it in the dbt_project as it demands from DML statements and these are disabeled with my curreny BigQuery plan.
 
-In the .github folder I have added a CI workflows to ensure safe releasing. To ensure the code quality I added sqlfluff with is a linting tool and is triggered in every commit by the pre-commit mechanism configured in .pre-commit-config.yaml.
+In the .github folder I have added a CI workflows to ensure safe releases. To ensure the code quality I added sqlfluff, with is a linting tool, and is triggered in every commit by the pre-commit mechanism configured in .pre-commit-config.yaml.
 
 ## 1-3 Exercice Answers
 --What is the number of orders in the year 2026? 1314
